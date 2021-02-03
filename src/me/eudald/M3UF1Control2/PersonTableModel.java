@@ -3,18 +3,23 @@ package me.eudald.M3UF1Control2;
 import me.eudald.M3UF1Control2.models.Person;
 
 import javax.swing.table.AbstractTableModel;
+import java.text.DateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class StudentTableModel extends AbstractTableModel {
+public class PersonTableModel extends AbstractTableModel {
     private final String[] columnNames = new String[]{"name", "surname", "dni", "email", "date"};
     private final List<Person> people;
+    private static final DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.ROOT);
 
-    public StudentTableModel(List<Person> people) {
+    public PersonTableModel(List<Person> people) {
         this.people = people;
     }
 
-    public StudentTableModel() {
+    public PersonTableModel() {
         people = new ArrayList<>();
     }
 
@@ -45,7 +50,7 @@ public class StudentTableModel extends AbstractTableModel {
             case 3:
                 return people.get(rowIndex).getEmail();
             case 4:
-                return people.get(rowIndex).getDate().toString();
+                return people.get(rowIndex).getDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT));
         }
         return null;
     }
