@@ -1,13 +1,11 @@
 package me.eudald.M3UF1Control2.models;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Student extends Person {
     private int age;
-    private List<ExamRecord> exams;
+    private boolean passed;
     private double tuition;
 
     public Student(String name,
@@ -16,29 +14,25 @@ public class Student extends Person {
                    String email,
                    LocalDate date,
                    int age,
-                   List<ExamRecord> exams,
+                   boolean passed,
                    double tuition) {
         super(name, surname, dni, email, date);
         this.age = age;
-        this.exams = exams;
+        this.passed = passed;
         this.tuition = tuition;
     }
 
-    public boolean hasPassed(ExamType type) {
-        return exams.stream()
-                .filter(e -> e.getType() == type) //filter only set type
-                .anyMatch(ExamRecord::isPassed); //return true if they passed
+    public Student() {
+    }
+
+    public boolean hasPassed() {
+        return passed;
     }
 
     @Override
     public String toString() {
-        String examsString = exams == null
-                ? ""
-                : String.format(" exams{%s},",
-                exams.stream().map(ExamRecord::toString).collect(Collectors.joining(",")));
-        return String.format("Student{Person='%s', age=%d,%s tuition=%s}",
-                super.toString(), age, examsString,
-                tuition);
+        return String.format("Student{Person='%s', age=%d, passed=%s, tuition=%s}",
+                super.toString(), age, passed, tuition);
     }
 
     public int getAge() {
@@ -47,14 +41,6 @@ public class Student extends Person {
 
     public void setAge(int age) {
         this.age = age;
-    }
-
-    public List<ExamRecord> getExams() {
-        return exams;
-    }
-
-    public void setExams(List<ExamRecord> exams) {
-        this.exams = exams;
     }
 
     public double getTuition() {
@@ -71,12 +57,11 @@ public class Student extends Person {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Student student = (Student) o;
-        return age == student.age && Double.compare(student.tuition, tuition) == 0
-                && Objects.equals(exams, student.exams);
+        return age == student.age && passed == student.passed && Double.compare(student.tuition, tuition) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), age, exams, tuition);
+        return Objects.hash(super.hashCode(), age, passed, tuition);
     }
 }

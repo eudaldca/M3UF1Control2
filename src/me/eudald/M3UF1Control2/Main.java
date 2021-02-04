@@ -15,7 +15,7 @@ public class Main {
                 "carles@campus.monlau.com",
                 LocalDate.now(),
                 22,
-                null,
+                true,
                 1200);
         Teacher gerard = new Teacher("Gerard", "Amiriam", "123456N", "gerard@monlau.com", LocalDate.now(), 2900);
         Employee berta = new Employee("Berta", "García", "12548796G", null, LocalDate.now(), 1200, EmployeeType.CLEANER);

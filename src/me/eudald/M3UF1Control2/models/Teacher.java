@@ -16,6 +16,9 @@ public class Teacher extends Employee {
         super(name, surname, dni, email, date, salary, EmployeeType.TEACHER);
     }
 
+    public Teacher() {
+    }
+
     @Override
     public String toString() {
         return String.format("Teacher{Employee='%s', students=%s}", super.toString(), students);

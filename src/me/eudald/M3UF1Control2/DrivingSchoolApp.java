@@ -14,8 +14,11 @@ import java.util.List;
 public class DrivingSchoolApp {
     private JPanel appPanel;
     private JTable studentsTable;
-    private JButton addPersonButton;
+    private JButton addStudentButton;
     private JButton editPersonButton;
+    private JButton deletePersonButton;
+    private JButton addEmployeeButton;
+    private JButton addTeacherButton;
     private final PersonTableModel tableModel;
 
     public DrivingSchoolApp() {
@@ -24,19 +27,28 @@ public class DrivingSchoolApp {
         studentsTable.setRowHeight(50);
         studentsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
+
         resizeColumnWidth(studentsTable);
-/*        editPersonButton.addActionListener(e -> {
+
+        editPersonButton.addActionListener(e -> {
             int selectedRow = studentsTable.getSelectedRow();
-            EditPerson dialog = new EditStudent(tableModel.getStudentAt(selectedRow), selectedRow, tableModel);
+            Person selectedPerson = tableModel.getPersonAt(selectedRow);
+            Class<? extends Person> p = selectedPerson.getClass();
+            JDialog dialog = null;
+            if (p == Student.class) dialog = new EditPerson(tableModel, selectedRow, selectedPerson);
+            if (dialog != null) {
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
+        });
+        addStudentButton.addActionListener(e -> {
+            EditPerson dialog = new EditPerson(tableModel, -1, new Student());
             dialog.pack();
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         });
-        addPersonButton.addActionListener(e -> {
-            EditPerson dialog = new EditStudent(null, null, tableModel);
-            dialog.pack();
-            dialog.setVisible(true);
-        });*/
+        deletePersonButton.addActionListener(e -> tableModel.removePersonAt(studentsTable.getSelectedRow()));
     }
 
     public static void main(String[] args) {
@@ -54,7 +66,7 @@ public class DrivingSchoolApp {
 
     public static List<Person> testData() {
         List<Person> result = new ArrayList<>();
-        result.add(new Student("Carles", "Pascual", "12541254F", "carles@campus.monlau.com", LocalDate.now(), 22, null, 1200));
+        result.add(new Student("Carles", "Pascual", "12541254F", "carles@campus.monlau.com", LocalDate.now(), 22, true, 1200));
         result.add(new Teacher("Gerard", "Amiriam", "123456N", "gerard@monlau.com", LocalDate.now(), 2900));
         result.add(new Employee("Berta", "García", "12548796G", null, LocalDate.now(), 1200, EmployeeType.CLEANER));
         return result;

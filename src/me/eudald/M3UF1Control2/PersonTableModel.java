@@ -3,17 +3,15 @@ package me.eudald.M3UF1Control2;
 import me.eudald.M3UF1Control2.models.Person;
 
 import javax.swing.table.AbstractTableModel;
-import java.text.DateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 public class PersonTableModel extends AbstractTableModel {
     private final String[] columnNames = new String[]{"name", "surname", "dni", "email", "date"};
     private final List<Person> people;
-    private static final DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.ROOT);
 
     public PersonTableModel(List<Person> people) {
         this.people = people;
@@ -53,5 +51,24 @@ public class PersonTableModel extends AbstractTableModel {
                 return people.get(rowIndex).getDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT));
         }
         return null;
+    }
+
+    public void addPerson(Person... person) {
+        this.people.addAll(Arrays.asList(person));
+        fireTableRowsInserted(people.size(), people.size() - 1 + person.length);
+    }
+
+    public Person getPersonAt(int row) {
+        return people.get(row);
+    }
+
+    public void updatePersonAt(int row, Person person) {
+        people.set(row, person);
+        this.fireTableRowsUpdated(row, row);
+    }
+
+    public void removePersonAt(int row) {
+        people.remove(row);
+        fireTableRowsDeleted(row, row);
     }
 }

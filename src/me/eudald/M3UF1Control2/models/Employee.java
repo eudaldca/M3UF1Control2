@@ -19,6 +19,9 @@ public class Employee extends Person {
         this.type = type;
     }
 
+    public Employee() {
+    }
+
     @Override
     public String toString() {
         return String.format("Employee{Person='%s', salary=%s, type='%s'}", super.toString(), salary, type.toString());

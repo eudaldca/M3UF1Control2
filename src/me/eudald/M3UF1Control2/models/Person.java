@@ -1,6 +1,8 @@
 package me.eudald.M3UF1Control2.models;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Objects;
 
 public abstract class Person {
@@ -9,6 +11,7 @@ public abstract class Person {
     private String dni;
     private String email;
     private LocalDate date;
+    public static final DateTimeFormatter DF = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
 
     public Person(String name, String surname, String dni, String email, LocalDate date) {
         this.name = name;
@@ -16,6 +19,10 @@ public abstract class Person {
         this.dni = dni;
         this.email = email;
         this.date = date;
+    }
+
+    public Person() {
+
     }
 
     @Override
@@ -62,6 +69,18 @@ public abstract class Person {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public void setDate(String date) {
+        setDate(parseDate(date));
+    }
+
+    public static LocalDate parseDate(String date) {
+        return LocalDate.parse(date, Student.DF);
+    }
+
+    public String getFormattedDate() {
+        return date.format(DF);
     }
 
     @Override
