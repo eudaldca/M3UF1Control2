@@ -2,6 +2,7 @@ package me.eudald.M3UF1Control2.models;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.Objects;
 
@@ -71,11 +72,11 @@ public abstract class Person {
         this.date = date;
     }
 
-    public void setDate(String date) {
+    public void setDate(String date) throws DateTimeParseException {
         setDate(parseDate(date));
     }
 
-    public static LocalDate parseDate(String date) {
+    public static LocalDate parseDate(String date) throws DateTimeParseException {
         return LocalDate.parse(date, Student.DF);
     }
 

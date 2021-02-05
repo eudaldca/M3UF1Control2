@@ -7,6 +7,7 @@ public class Student extends Person {
     private int age;
     private boolean passed;
     private double tuition;
+    private Teacher teacher;
 
     public Student(String name,
                    String surname,
@@ -15,11 +16,12 @@ public class Student extends Person {
                    LocalDate date,
                    int age,
                    boolean passed,
-                   double tuition) {
+                   double tuition, Teacher teacher) {
         super(name, surname, dni, email, date);
         this.age = age;
         this.passed = passed;
         this.tuition = tuition;
+        this.teacher = teacher;
     }
 
     public Student() {
@@ -63,5 +65,13 @@ public class Student extends Person {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), age, passed, tuition);
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 }

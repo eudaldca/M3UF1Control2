@@ -16,7 +16,7 @@ public class Main {
                 LocalDate.now(),
                 22,
                 true,
-                1200);
+                1200, null);
         Teacher gerard = new Teacher("Gerard", "Amiriam", "123456N", "gerard@monlau.com", LocalDate.now(), 2900);
         Employee berta = new Employee("Berta", "García", "12548796G", null, LocalDate.now(), 1200, EmployeeType.CLEANER);
         System.out.println();

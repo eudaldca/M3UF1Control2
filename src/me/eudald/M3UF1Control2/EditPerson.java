@@ -1,14 +1,15 @@
 package me.eudald.M3UF1Control2;
 
-import me.eudald.M3UF1Control2.models.Employee;
-import me.eudald.M3UF1Control2.models.EmployeeType;
-import me.eudald.M3UF1Control2.models.Person;
-import me.eudald.M3UF1Control2.models.Student;
+import me.eudald.M3UF1Control2.models.*;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 
 public class EditPerson extends JDialog {
     private JPanel contentPane;
@@ -26,6 +27,8 @@ public class EditPerson extends JDialog {
     private JComboBox<EmployeeType> positionComboBox;
     private JPanel employeePanel;
     private JPanel studentPanel;
+    private JLabel positionLabel;
+    private JComboBox<Teacher> teacherComboBox;
 
     private final PersonTableModel model;
     private final int row;
@@ -35,7 +38,37 @@ public class EditPerson extends JDialog {
         this.model = model;
         this.row = row;
         this.person = person;
-        if (this.person != null) setValues(this.person);
+
+        //add items to combo boxes
+        Arrays.stream(EmployeeType.values()).forEach(positionComboBox::addItem);
+        if (model != null) model.getPeople()
+                .stream().filter(Teacher.class::isInstance)
+                .map(Teacher.class::cast)
+                .forEach(teacherComboBox::addItem);
+
+        positionComboBox.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            BasicComboBoxRenderer bcr = new BasicComboBoxRenderer();
+            if (value != null) bcr.setText(value.getName());
+            return bcr;
+        });
+        teacherComboBox.setRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            BasicComboBoxRenderer bcr = new BasicComboBoxRenderer();
+            if (value != null) bcr.setText(value.getName());
+            return bcr;
+        });
+        if (row < 0) {
+            teacherComboBox.setSelectedItem(null);
+            positionComboBox.setSelectedItem(null);
+        }
+
+        if (this.person.getName() != null) setValues(this.person);
+
+        employeePanel.setVisible(this.person instanceof Employee);
+        studentPanel.setVisible(this.person instanceof Student);
+
+        positionLabel.setVisible(!(this.person instanceof Teacher));
+        positionComboBox.setVisible(!(this.person instanceof Teacher));
+
 
         setContentPane(contentPane);
         setModal(true);
@@ -59,11 +92,16 @@ public class EditPerson extends JDialog {
     }
 
     private void onOK() {
-        if (model != null) {
-            if (person != null) model.updatePersonAt(row, getValues());
-            else model.addPerson(getValues());
+        try {
+            if (model != null) {
+                if (row >= 0) model.updatePersonAt(row, getValues());
+                else model.addPerson(getValues());
+            }
+            dispose();
+        } catch (DateTimeParseException e) {
+            JOptionPane.showMessageDialog(this, "Incorrect date format" +
+                    "\nCorrect format is dd/MM/yy");
         }
-        dispose();
     }
 
     private void onCancel() {
@@ -71,25 +109,37 @@ public class EditPerson extends JDialog {
     }
 
     public static void main(String[] args) {
-        EditPerson dialog = new EditPerson(null, -1, new Employee());
+        EditPerson dialog = new EditPerson(null, -1, new Student());
         dialog.pack();
         dialog.setVisible(true);
         System.exit(0);
     }
 
 
-    private Person getValues() {
-        if ((person != null && person instanceof Student))
-            new Student(
-                    nameTextField.getText(),
-                    surnameTextField.getText(),
-                    dniTextField.getText(),
-                    emailTextField.getText(),
-                    Student.parseDate(dateTextField.getText()),
-                    (int) ageSpinner.getValue(),
-                    passedCheckbox.isSelected(),
-                    ((Integer) tuitionSpinner.getValue()).doubleValue()
-            );
+    private double getDouble(Object value) {
+        if (value instanceof Double) return (double) value;
+        else if (value instanceof Integer) return ((Integer) value).doubleValue();
+        return 0;
+    }
+
+    private Person getValues() throws DateTimeParseException {
+        String name = nameTextField.getText();
+        String surname = surnameTextField.getText();
+        String dni = dniTextField.getText();
+        String email = emailTextField.getText();
+        LocalDate date = Student.parseDate(dateTextField.getText());
+        if (person != null)
+            if (person instanceof Student) {
+                Object value = tuitionSpinner.getValue();
+                return new Student(name, surname, dni, email, date, (int) ageSpinner.getValue(),
+                        passedCheckbox.isSelected(), getDouble(value), ((Teacher) teacherComboBox.getSelectedItem()));
+            }
+        if (person instanceof Employee) {
+            double salary = (double) salarySpinner.getValue();
+            if (person instanceof Teacher)
+                return new Teacher(name, surname, dni, email, date, salary);
+            return new Employee(name, surname, dni, email, date, salary, (EmployeeType) positionComboBox.getSelectedItem());
+        }
         return null;
     }
 
@@ -103,6 +153,7 @@ public class EditPerson extends JDialog {
             ageSpinner.setValue(((Student) person).getAge());
             passedCheckbox.setSelected(((Student) person).hasPassed());
             tuitionSpinner.setValue(((Student) person).getTuition());
+            teacherComboBox.setSelectedItem(((Student) person).getTeacher());
         } else if (person instanceof Employee) {
             salarySpinner.setValue(((Employee) person).getSalary());
             positionComboBox.setSelectedItem(((Employee) person).getType());

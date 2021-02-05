@@ -1,6 +1,7 @@
 package me.eudald.M3UF1Control2;
 
 import me.eudald.M3UF1Control2.models.Person;
+import me.eudald.M3UF1Control2.models.Teacher;
 
 import javax.swing.table.AbstractTableModel;
 import java.time.format.DateTimeFormatter;
@@ -8,10 +9,15 @@ import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PersonTableModel extends AbstractTableModel {
     private final String[] columnNames = new String[]{"name", "surname", "dni", "email", "date"};
     private final List<Person> people;
+
+    public List<Person> getPeople() {
+        return people;
+    }
 
     public PersonTableModel(List<Person> people) {
         this.people = people;
