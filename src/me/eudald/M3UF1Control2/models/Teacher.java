@@ -1,8 +1,6 @@
 package me.eudald.M3UF1Control2.models;
 
 import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Set;
 
 public class Teacher extends Employee {
     public Teacher(String name,
