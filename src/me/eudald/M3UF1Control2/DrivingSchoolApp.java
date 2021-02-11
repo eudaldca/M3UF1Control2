@@ -7,9 +7,11 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DrivingSchoolApp {
     private JPanel appPanel;
@@ -19,6 +21,7 @@ public class DrivingSchoolApp {
     private JButton deletePersonButton;
     private JButton addEmployeeButton;
     private JButton addTeacherButton;
+    private JButton statsButton;
     private final PersonTableModel tableModel;
 
     public DrivingSchoolApp() {
@@ -48,6 +51,17 @@ public class DrivingSchoolApp {
         deletePersonButton.addActionListener(e -> {
             int selectedRow = studentsTable.getSelectedRow();
             if (selectedRow >= 0) tableModel.removePersonAt(selectedRow);
+        });
+        statsButton.addActionListener(e -> {
+            JDialog dialog = new JDialog();
+            dialog.setLayout(new GridLayout(0, 2));
+            getStats(tableModel.getPeople()).forEach((key, value) -> {
+                dialog.add(new JLabel(key + ": ", SwingConstants.RIGHT));
+                dialog.add(new JLabel(value));
+            });
+            dialog.pack();
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
         });
     }
 
@@ -91,6 +105,41 @@ public class DrivingSchoolApp {
             if (width > 300) width = 300;
             columnModel.getColumn(column).setPreferredWidth(width);
         }
+    }
+
+    private Map<String, String> getStats(List<Person> people) {
+        Map<String, String> result = new LinkedHashMap<>();
+        DecimalFormat df = new DecimalFormat("0.##");
+        result.put("Cost", df.format(people.stream()
+                .filter(p -> p instanceof Employee).map(Employee.class::cast)
+                .map(Employee::getSalary)
+                .reduce(0.0, Double::sum)
+        ));
+        result.put("Tuitions", df.format(people.stream()
+                .filter(p -> p instanceof Student).map(Student.class::cast)
+                .map(Student::getTuition)
+                .reduce(0.0, Double::sum)
+        ));
+
+        result.put("Number of Employees", String.valueOf(people.stream().filter(p -> p instanceof Employee).count()));
+        result.put("Number of Students", String.valueOf(people.stream().filter(p -> p instanceof Student).count()));
+        result.put("Number of Teachers", String.valueOf(people.stream().filter(p -> p instanceof Teacher).count()));
+
+        people.stream().filter(p -> p instanceof Student)
+                .map(Student.class::cast)
+                .map(Student::getTeacher).filter(Objects::nonNull)
+                //group by teacher, count number of repetitions (equals number of students)
+                .collect(Collectors.groupingBy(t -> t, Collectors.counting()))
+                .forEach((teacher, count) -> result.put(teacher.getName(), count.toString() + " student"));
+
+        people.stream().filter(p -> p instanceof Student)
+                .map(Student.class::cast).filter(s -> s.getTeacher() != null)
+                //group by teacher, count number of repetitions (equals number of students)
+                .collect(Collectors.groupingBy(Student::getTeacher,
+                        Collectors.mapping(Student::getName,
+                                Collectors.joining(", "))))
+                .forEach((teacher, s) -> result.put(teacher.getName(), s));
+        return result;
     }
 
 }

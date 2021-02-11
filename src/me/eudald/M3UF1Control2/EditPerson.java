@@ -135,7 +135,8 @@ public class EditPerson extends JDialog {
                         passedCheckbox.isSelected(), getDouble(value), ((Teacher) teacherComboBox.getSelectedItem()));
             }
         if (person instanceof Employee) {
-            double salary = (double) salarySpinner.getValue();
+            Object value = salarySpinner.getValue();
+            double salary = value instanceof Double ? (double) value : ((Integer) value).doubleValue();
             if (person instanceof Teacher)
                 return new Teacher(name, surname, dni, email, date, salary);
             return new Employee(name, surname, dni, email, date, salary, (EmployeeType) positionComboBox.getSelectedItem());
